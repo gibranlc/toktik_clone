@@ -65,9 +65,9 @@ class _VideoPostWidgetState extends State<VideoPostWidget>
       final startMuted = kIsWeb ? true : actions.isMuted(widget.post.id);
       await controller.setVolume(startMuted ? 0 : 1);
 
-      // Mantén sincronizado el icono/estado del provider en Web (opcional).
+      // Sincronizado el icono/estado del provider en Web
       if (kIsWeb && !actions.isMuted(widget.post.id)) {
-        actions.toggleMute(widget.post.id); // refleja que arrancó muteado
+        actions.toggleMute(widget.post.id);
       }
       // ====== Fin Web fix ======
 
@@ -104,7 +104,6 @@ class _VideoPostWidgetState extends State<VideoPostWidget>
       _syncPlayState();
     }
 
-    // Si llegara a cambiar el asset (reciclado), recrea el controller.
     if (oldWidget.post.assetPath != widget.post.assetPath) {
       _disposeController();
       _initialized = false;
@@ -154,7 +153,7 @@ class _VideoPostWidgetState extends State<VideoPostWidget>
         // En Web: si está muteado (autoplay permitido), primer tap puede activar sonido.
         if (kIsWeb) {
           if (isMuted) {
-            actions.toggleMute(widget.post.id); // actualiza UI
+            actions.toggleMute(widget.post.id);
             await controller.setVolume(1); // activa sonido
             if (!controller.value.isPlaying) {
               await controller.play();
@@ -185,19 +184,16 @@ class _VideoPostWidgetState extends State<VideoPostWidget>
           else if (!_initialized || controller == null)
             const Center(child: CircularProgressIndicator())
           else
-            // ✅ AspectRatio es más robusto que FittedBox para video_player
             Center(
               child: AspectRatio(
                 aspectRatio:
                     controller.value.isInitialized &&
                         controller.value.aspectRatio.isFinite
                     ? controller.value.aspectRatio
-                    : (9 / 16), // Fallback vertical si la metadata tarda
+                    : (9 / 16),
                 child: VideoPlayer(controller),
               ),
             ),
-
-          // --- Gradiente inferior ---
           const _BottomGradient(),
 
           // --- Texto (usuario, caption, fecha) ---
@@ -234,7 +230,7 @@ class _VideoPostWidgetState extends State<VideoPostWidget>
             ),
           ),
 
-          // --- Overlay guía (solo Web y cuando está muteado) ---
+          // --- Overlay guía (solo Web)
           if (kIsWeb && isMuted && _initialized)
             Positioned(
               top: 24,
@@ -310,22 +306,7 @@ class _CaptionArea extends StatelessWidget {
           const SizedBox(height: 6),
           Text(caption, maxLines: 3, overflow: TextOverflow.ellipsis),
           const SizedBox(height: 6),
-          const Text(
-            // fecha ya formateada arriba
-            // (ponemos estilo aquí)
-            '',
-            // este Text vacío evita warning si editas arriba;
-            // en tu versión original usas:
-            // Text(date, style: TextStyle(...))
-          ),
-          // Reemplaza el Text anterior por este si prefieres una sola línea:
-          // Text(
-          //   date,
-          //   style: const TextStyle(
-          //     color: Color.fromRGBO(255, 255, 255, 0.8),
-          //     fontSize: 12,
-          //   ),
-          // ),
+          const Text(''),
         ],
       ),
     );
